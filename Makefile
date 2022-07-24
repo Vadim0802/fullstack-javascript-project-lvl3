@@ -5,7 +5,7 @@ install-deps:
 	npm ci
 
 lint:
-	npm lint
+	npm run lint
 
 test:
 	npm test
