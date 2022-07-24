@@ -1,0 +1,30 @@
+{
+  "name": "@hexlet/code",
+  "version": "1.0.0",
+  "description": "Third project of Hexlet",
+  "main": "index.js",
+  "scripts": {
+    "test": "npx jest",
+    "lint": "npx eslint"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Vadim0802/fullstack-javascript-project-lvl3.git"
+  },
+  "author": "v.bodianskii",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Vadim0802/fullstack-javascript-project-lvl3/issues"
+  },
+  "homepage": "https://github.com/Vadim0802/fullstack-javascript-project-lvl3#readme",
+  "devDependencies": {
+    "eslint": "^8.20.0",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-plugin-import": "^2.26.0"
+  },
+  "dependencies": {
+    "axios": "^0.27.2",
+    "eslint-plugin-jest": "^26.6.0",
+    "jest": "^28.1.3"
+  }
+}
