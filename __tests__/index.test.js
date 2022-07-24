@@ -1,3 +1,5 @@
-test('testing', () => {
-  expect(1).toEqual(1);
+import square from '../index.js';
+
+test('square', () => {
+  expect(square(2)).toEqual(4);
 });
