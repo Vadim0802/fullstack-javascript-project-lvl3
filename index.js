@@ -1,3 +1,13 @@
-const square = (number) => number ** 2;
+import path from 'path';
+import { buildResourceFilename } from './src/utils.js';
+import downloadResource from './src/index.js';
 
-export default square;
+const pageLoader = async (url, dirpath) => {
+  const resourceFilename = buildResourceFilename(url);
+  const pathToDownloadedResource = path.join(dirpath, resourceFilename);
+  await downloadResource(url, pathToDownloadedResource);
+
+  return pathToDownloadedResource;
+};
+
+export default pageLoader;
