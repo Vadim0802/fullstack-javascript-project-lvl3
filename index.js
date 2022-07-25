@@ -4,7 +4,7 @@ import downloadResource from './src/index.js';
 
 const pageLoader = async (url, dirpath) => {
   const resourceFilename = buildResourceFilename(url);
-  const pathToDownloadedResource = path.join(dirpath, resourceFilename);
+  const pathToDownloadedResource = path.resolve(dirpath, resourceFilename);
   await downloadResource(url, pathToDownloadedResource);
 
   return pathToDownloadedResource;
