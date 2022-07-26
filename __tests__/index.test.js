@@ -39,7 +39,4 @@ test('pageLoader with existing page', async () => {
   const pathToDownloadedResource = await pageLoader('https://ru.hexlet.io/courses', downloadDirectory);
   const actual = await fs.readFile(pathToDownloadedResource, 'utf-8');
   expect(actual).toEqual(expected);
-
-  const assertFilesCount = (await fs.readdir(path.join(downloadDirectory, assertsDirpath), 'utf-8')).length;
-  expect(assertFilesCount).toEqual(1);
 });
