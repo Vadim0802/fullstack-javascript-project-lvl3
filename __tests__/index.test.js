@@ -20,7 +20,7 @@ const assets = [
   '/assets/application.css',
 ];
 const before = await fs.readFile(getFixturePath('before.html'), 'utf-8');
-nock(hostname).get(pathname).times(2).reply(200, before);
+const scope = nock(hostname).get(pathname).times(2).reply(200, before);
 
 let expected;
 beforeAll(async () => {
@@ -34,7 +34,7 @@ beforeEach(async () => {
 });
 
 test('pageLoader with existing page', async () => {
-  assets.forEach(async (asset) => nock(hostname).get(asset).reply(200, await fs.readFile(getFixturePath(asset), 'utf-8')));
+  assets.forEach((asset) => scope.get(asset).reply(200, fs.readFile(getFixturePath(asset), 'utf-8')));
 
   const pathToDownloadedResource = await pageLoader('https://ru.hexlet.io/courses', downloadDirectory);
   const actual = await fs.readFile(pathToDownloadedResource, 'utf-8');
