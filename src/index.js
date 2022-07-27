@@ -28,8 +28,7 @@ export default (link, dirpath) => {
         const assertFilepath = path.join(assertsDirpath, buildAssetFilenameFromUrl(assertUrl));
         buildPromise(assertUrl, assertFilepath);
         const { base } = path.parse(assertFilepath);
-        const src = `${assertsDirname}/${base}`;
-        $(node).attr('src', src);
+        $(node).attr('src', `${assertsDirname}/${base}`);
       });
 
       const prettifyHtml = prettier.format($.html(), { parser: 'html' });
