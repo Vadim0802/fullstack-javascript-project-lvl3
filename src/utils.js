@@ -1,12 +1,14 @@
 export const buildFilenameFromUrl = (link, prefix = '') => {
-  const urlObj = new URL(link);
-  return `${urlObj.hostname}${urlObj.pathname === '/' ? '' : urlObj.pathname}`
+  const url = new URL(link);
+  return `${url.hostname}${url.pathname === '/' ? '' : url.pathname}`
     .replace(/[^0-9a-zA-Z]/g, '-')
     .concat(prefix);
 };
 
 export const buildAssetFilenameFromUrl = (link) => {
-  const extension = link.slice(link.lastIndexOf('.'));
-  const formatted = buildFilenameFromUrl(link);
+  const url = new URL(link);
+  const resource = `${url.origin}${url.pathname === '/' ? '' : url.pathname}`;
+  const extension = resource.slice(link.lastIndexOf('.'));
+  const formatted = buildFilenameFromUrl(resource);
   return formatted.slice(0, formatted.lastIndexOf('-')).concat(extension);
 };

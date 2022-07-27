@@ -11,9 +11,16 @@ const getFixturePath = (name) => path.join(__dirname, '..', '__fixtures__', name
 const noop = () => { };
 const hostname = 'https://ru.hexlet.io';
 const pathname = '/courses';
-const assertResource = '/assets/professions/nodejs.png';
 
 nock.disableNetConnect();
+
+const assets = [
+  '/assets/nodejs.png',
+  '/assets/runtime.js',
+  '/assets/application.css',
+];
+const before = await fs.readFile(getFixturePath('before.html'), 'utf-8');
+nock(hostname).get(pathname).times(2).reply(200, before);
 
 let expected;
 beforeAll(async () => {
@@ -27,13 +34,7 @@ beforeEach(async () => {
 });
 
 test('pageLoader with existing page', async () => {
-  const before = await fs.readFile(getFixturePath('before.html'), 'utf-8');
-  const buffer = await fs.readFile(getFixturePath('assets/nodejs.png'), 'binary');
-  nock(hostname)
-    .get(pathname)
-    .reply(200, before)
-    .get(assertResource)
-    .reply(200, buffer);
+  assets.forEach(async (asset) => nock(hostname).get(asset).reply(200, await fs.readFile(getFixturePath(asset), 'utf-8')));
 
   const pathToDownloadedResource = await pageLoader('https://ru.hexlet.io/courses', downloadDirectory);
   const actual = await fs.readFile(pathToDownloadedResource, 'utf-8');

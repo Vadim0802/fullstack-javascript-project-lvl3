@@ -5,30 +5,48 @@ import prettier from 'prettier';
 import * as cheerio from 'cheerio';
 import { buildAssetFilenameFromUrl, buildFilenameFromUrl } from './utils.js';
 
-const buildPromise = (link, assertFilepath) => {
-  const { dir } = path.parse(assertFilepath);
+const buildPromise = (link, assetFilepath) => {
+  const { dir } = path.parse(assetFilepath);
   return fs.mkdir(dir, { recursive: true })
     .then(() => axios.get(link, { responseType: 'arraybuffer' }))
-    .then(({ data: buffer }) => fs.writeFile(assertFilepath, buffer, 'binary'));
+    .then(({ data: buffer }) => fs.writeFile(assetFilepath, buffer, 'binary'));
 };
 
 export default (link, dirpath) => {
   const urlInstance = new URL(link);
   const resourceFilename = buildFilenameFromUrl(link, '.html');
   const resourceFilepath = path.resolve(dirpath, resourceFilename);
-  const assertsDirname = buildFilenameFromUrl(link, '_files');
-  const assertsDirpath = path.resolve(dirpath, assertsDirname);
+  const assetsDirname = buildFilenameFromUrl(link, '_files');
+  const assetsDirpath = path.resolve(dirpath, assetsDirname);
 
   return axios.get(link)
     .then(({ data }) => {
       const $ = cheerio.load(data);
 
-      $('img').each((_, node) => {
-        const assertUrl = `${urlInstance.origin}${node.attribs.src}`;
-        const assertFilepath = path.join(assertsDirpath, buildAssetFilenameFromUrl(assertUrl));
-        buildPromise(assertUrl, assertFilepath);
+      $('img, script[src], link[href]').each((_, node) => {
+        const assetUrl = new URL(`${node.attribs.src || node.attribs.href}`, urlInstance.origin);
+
+        if (!assetUrl.toString().startsWith(urlInstance.origin)) {
+          return;
+        }
+
+        const assertFilepath = path.join(
+          assetsDirpath,
+          node.attribs.rel === 'canonical'
+            ? buildFilenameFromUrl(assetUrl.toString(), '.html')
+            : buildAssetFilenameFromUrl(assetUrl.toString()),
+        );
+
+        buildPromise(assetUrl.toString(), assertFilepath);
         const { base } = path.parse(assertFilepath);
-        $(node).attr('src', `${assertsDirname}/${base}`);
+
+        const attributeTypes = {
+          img: 'src',
+          script: 'src',
+          link: 'href',
+        };
+
+        $(node).attr(attributeTypes[node.tagName], `${assetsDirname}/${base}`);
       });
 
       const prettifyHtml = prettier.format($.html(), { parser: 'html' });
