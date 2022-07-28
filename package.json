@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "description": "Third project of Hexlet",
   "main": "index.js",
+  "bin": {
+    "page-loader": "bin/page-loader.js"
+  },
   "type": "module",
   "scripts": {
     "test": "cross-env NODE_OPTIONS=--experimental-vm-modules npx jest",
