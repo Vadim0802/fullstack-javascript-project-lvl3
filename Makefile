@@ -1,5 +1,5 @@
-run:
-	bin/page-loader.js
+page-loader:
+	node bin/page-loader.js
 
 install-deps:
 	npm ci
