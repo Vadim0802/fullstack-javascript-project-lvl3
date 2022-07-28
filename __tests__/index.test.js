@@ -20,11 +20,12 @@ const assets = [
   '/assets/runtime.js',
   '/assets/application.css',
 ];
-const before = await fs.readFile(getFixturePath('before.html'), 'utf-8');
 const scope = nock(hostname);
 
+let before;
 let expected;
 beforeAll(async () => {
+  before = await fs.readFile(getFixturePath('before.html'), 'utf-8');
   expected = await fs.readFile(getFixturePath('after.html'), 'utf-8');
 });
 
