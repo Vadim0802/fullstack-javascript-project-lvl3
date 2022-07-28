@@ -11,6 +11,7 @@ const getFixturePath = (name) => path.join(__dirname, '..', '__fixtures__', name
 const noop = () => { };
 const hostname = 'https://ru.hexlet.io';
 const pathname = '/courses';
+const link = `${hostname}${pathname}`;
 
 nock.disableNetConnect();
 
@@ -37,18 +38,45 @@ beforeEach(async () => {
   scope.get(pathname).times(2).reply(200, before);
 });
 
-test('pageLoader with existing page', async () => {
-  assets.forEach((asset) => scope.get(asset).reply(200, fs.readFile(getFixturePath(asset), 'utf-8')));
+test('page-loader with existing page', async () => {
+  assets.forEach((asset) => {
+    scope
+      .get(asset)
+      .reply(200, fs.readFile(getFixturePath(asset), 'utf-8'));
+  });
 
-  const pathToDownloadedResource = await pageLoader('https://ru.hexlet.io/courses', downloadDirectory);
+  const pathToDownloadedResource = await pageLoader(link, downloadDirectory);
   const actual = await fs.readFile(pathToDownloadedResource, 'utf-8');
   expect(actual).toEqual(expected);
 });
 
+test('page-loader should load page with list error', async () => {
+  assets.forEach((asset) => {
+    scope
+      .get(asset)
+      .reply(404);
+  });
+  await expect(async () => {
+    const pathToDownloadedResource = await pageLoader(link, downloadDirectory);
+    const actual = await fs.readFile(pathToDownloadedResource, 'utf-8');
+    expect(actual).toEqual(expected);
+  }).rejects.toThrow('Something went wrong');
+});
+
 test('page-loader should fail and show ENOENT error', async () => {
-  await expect(pageLoader('https://ru.hexlet.io/courses', '/wrong/path')).rejects.toThrow('ENOENT');
+  await expect(pageLoader(link, '/wrong/path')).rejects.toThrow('ENOENT');
 });
 
 test('page-loader should fail and show EACCES error', async () => {
-  await expect(pageLoader('https://ru.hexlet.io/courses', noAccessDownloadDirectory)).rejects.toThrow('EACCES');
+  await expect(pageLoader(link, noAccessDownloadDirectory)).rejects.toThrow('EACCES');
+});
+
+test('page-loader should fail with invalid url', async () => {
+  const errorUrl = `${link}/error`;
+  const urlPath = '/courses/error';
+  scope
+    .get(urlPath)
+    .reply(404, []);
+
+  await expect(pageLoader(errorUrl, downloadDirectory)).rejects.toThrow('404');
 });
