@@ -20,7 +20,7 @@ const assets = [
   '/assets/application.css',
 ];
 const before = await fs.readFile(getFixturePath('before.html'), 'utf-8');
-const scope = nock(hostname).get(pathname).times(2).reply(200, before);
+const scope = nock(hostname);
 
 let expected;
 beforeAll(async () => {
@@ -28,9 +28,13 @@ beforeAll(async () => {
 });
 
 let downloadDirectory;
+let noAccessDownloadDirectory;
 beforeEach(async () => {
   await fs.rm(downloadDirectory, { recursive: true, force: true }).catch(noop);
   downloadDirectory = await fs.mkdtemp(path.join(os.tmpdir(), 'page-loader-'));
+  noAccessDownloadDirectory = await fs.mkdtemp(path.join(os.tmpdir(), 'page-loader-no-access'));
+  await fs.chmod(noAccessDownloadDirectory, 0o000);
+  scope.get(pathname).times(2).reply(200, before);
 });
 
 test('pageLoader with existing page', async () => {
@@ -39,4 +43,12 @@ test('pageLoader with existing page', async () => {
   const pathToDownloadedResource = await pageLoader('https://ru.hexlet.io/courses', downloadDirectory);
   const actual = await fs.readFile(pathToDownloadedResource, 'utf-8');
   expect(actual).toEqual(expected);
+});
+
+test('page-loader should fail and show ENOENT error', async () => {
+  await expect(pageLoader('https://ru.hexlet.io/courses', '/wrong/path')).rejects.toThrow('ENOENT');
+});
+
+test('page-loader should fail and show EACCES error', async () => {
+  await expect(pageLoader('https://ru.hexlet.io/courses', noAccessDownloadDirectory)).rejects.toThrow('EACCES');
 });
