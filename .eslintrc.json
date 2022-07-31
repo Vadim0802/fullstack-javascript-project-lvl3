@@ -5,7 +5,11 @@
     },
     "extends": [
         "airbnb-base",
-        "plugin:jest/recommended"
+        "plugin:jest/recommended",
+        "prettier"
+    ],
+    "plugins": [
+        "prettier"
     ],
     "parserOptions": {
         "ecmaVersion": "latest",
@@ -14,6 +18,7 @@
     "rules": {
         "import/extensions": "off",
         "no-console": "off",
-        "no-underscore-dangle": "off"
+        "no-underscore-dangle": "off",
+        "prettier/prettier": ["error"]
     }
 }
