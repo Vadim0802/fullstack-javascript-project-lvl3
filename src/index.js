@@ -20,8 +20,8 @@ export default (link, dirpath) => {
     new Listr([
       {
         title: "Downloading assets.",
-        task: () => {
-          const tasks = new Listr(
+        task: () =>
+          new Listr(
             urls.map(({ assetUrl, assetFilepath }) => {
               const title = `Saving ${assetUrl}`;
               const promise = buildPromise(
@@ -33,11 +33,11 @@ export default (link, dirpath) => {
                 task: () => promise,
               };
             }),
-            { concurrent: true, exitOnError: false }
-          );
-
-          return tasks;
-        },
+            {
+              concurrent: true,
+              exitOnError: false,
+            }
+          ),
       },
     ]);
 
